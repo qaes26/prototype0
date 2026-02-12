@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إلى حبيبتي</title>
+    <!-- استدعاء خطوط عربية جميلة وتيلويند للتصميم -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            overflow-x: hidden;
+        }
+
+        .font-amiri {
+            font-family: 'Amiri', serif;
+        }
+
+        /* تأثيرات الخلفية المتحركة */
+        .bg-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.1;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 3.22l-.61-.6a5.5 5.5 0 0 0-7.78 7.77L10 18.78l8.39-8.4a5.5 5.5 0 0 0-7.78-7.77l-.61.61z' fill='%23ff0000' fill-opacity='0.4'/%3E%3C/svg%3E");
+            animation: moveBackground 60s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            from { background-position: 0 0; }
+            to { background-position: 100% 100%; }
+        }
+
+        /* تنسيق الزر المتفجر */
+        .pulse-button {
+            box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7);
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(225, 29, 72, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
+        }
+
+        /* الكانفاس الخاص بالانفجار */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .hidden-element {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .visible-element {
+            display: flex;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 relative">
+
+    <div class="bg-hearts"></div>
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- شاشة الزر (المفاجأة) - تظهر مباشرة الآن -->
+    <div id="trigger-screen" class="fixed inset-0 z-40 flex flex-col items-center justify-center bg-pink-50/90 transition-all duration-700">
+        <div class="glass-card p-10 rounded-3xl shadow-2xl text-center transform hover:scale-105 transition-transform duration-300">
+            <h1 class="text-4xl md:text-5xl font-bold text-rose-600 mb-8 font-amiri animate-bounce">مرحباً يا حبيبتي ❤️</h1>
+            <p class="mb-8 text-gray-600 text-lg">هناك مفاجأة صغيرة بانتظارك...</p>
+            <button onclick="startExplosion()" class="pulse-button bg-gradient-to-r from-rose-500 to-pink-600 text-white text-3xl font-bold py-6 px-12 rounded-full shadow-2xl transform transition hover:scale-110">
+                اضغطي هنا
+            </button>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div id="main-content" class="hidden-element flex-col min-h-screen relative z-10 pt-10 pb-20 px-4">
+        
+        <!-- العنوان -->
+        <header class="text-center mb-10">
+            <h1 class="text-5xl md:text-7xl font-amiri text-rose-600 mb-2 drop-shadow-md">إلى حبيبتي</h1>
+            <p class="text-xl text-gray-500 font-light">أنتِ كل الحكاية</p>
+        </header>
+
+        <!-- العداد -->
+        <div class="container mx-auto mb-16">
+            <div class="glass-card rounded-3xl p-6 md:p-10 shadow-xl border-t-4 border-rose-400">
+                <h3 class="text-center text-3xl font-bold text-gray-700 mb-8 font-amiri text-rose-600">نحب بعضنا منذ:</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div class="bg-rose-100 p-4 rounded-xl shadow-inner">
+                        <span id="days" class="block text-4xl md:text-5xl font-bold text-rose-600">0</span>
+                        <span class="text-gray-600 font-medium">يوم</span>
+                    </div>
+                    <div class="bg-rose-100 p-4 rounded-xl shadow-inner">
+                        <span id="hours" class="block text-4xl md:text-5xl font-bold text-rose-600">0</span>
+                        <span class="text-gray-600 font-medium">ساعة</span>
+                    </div>
+                    <div class="bg-rose-100 p-4 rounded-xl shadow-inner">
+                        <span id="minutes" class="block text-4xl md:text-5xl font-bold text-rose-600">0</span>
+                        <span class="text-gray-600 font-medium">دقيقة</span>
+                    </div>
+                    <div class="bg-rose-100 p-4 rounded-xl shadow-inner">
+                        <span id="seconds" class="block text-4xl md:text-5xl font-bold text-rose-600">0</span>
+                        <span class="text-gray-600 font-medium">ثانية</span>
+                    </div>
+                </div>
+                <p class="text-center mt-6 text-rose-400 text-sm md:text-base font-bold">منذ تاريخ 23/11/2025 وحتى هذه اللحظة</p>
+            </div>
+        </div>
+
+        <!-- قسم الغزل المتجدد -->
+        <div class="container mx-auto max-w-3xl">
+            <div class="relative glass-card p-8 md:p-12 rounded-2xl shadow-lg text-center min-h-[300px] flex flex-col justify-center items-center">
+                <div class="text-6xl text-rose-200 absolute top-4 right-6">"</div>
+                <p id="poem-text" class="text-2xl md:text-4xl font-amiri leading-relaxed text-gray-800 transition-opacity duration-1000 opacity-100">
+                    جاري تحميل مشاعري لكِ...
+                </p>
+                <div class="text-6xl text-rose-200 absolute bottom-4 left-6">"</div>
+                
+                <div class="mt-8 flex gap-2 justify-center">
+                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-bounce"></span>
+                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-bounce" style="animation-delay: 0.2s"></span>
+                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-bounce" style="animation-delay: 0.4s"></span>
+                </div>
+            </div>
+            <button onclick="nextPoem()" class="mt-6 mx-auto block bg-white border border-rose-300 text-rose-500 px-6 py-2 rounded-full hover:bg-rose-50 transition shadow-sm font-bold">
+                كلام آخر ❤️
+            </button>
+        </div>
+
+        <!-- التوقيع -->
+        <footer class="mt-20 text-center text-gray-500">
+            <p class="text-lg">صُمم بكل حب</p>
+            <p class="text-2xl font-bold text-rose-600 font-amiri mt-1">من إعداد قيس جازي</p>
+            <p class="text-xs mt-2 text-gray-400">الحقوق محفوظة لقلبك فقط</p>
+        </footer>
+    </div>
+
+    <script>
+        // === 1. منطق الانفجار (Confetti) ===
+        const canvas = document.getElementById("confetti-canvas");
+        const ctx = canvas.getContext("2d");
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createParticle(x, y) {
+            const particle = {
+                x: x,
+                y: y,
+                size: Math.random() * 10 + 5,
+                color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+                speedX: Math.random() * 10 - 5,
+                speedY: Math.random() * 10 - 5,
+                gravity: 0.1,
+                life: 120
+            };
+            particles.push(particle);
+        }
+
+        function updateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.speedX;
+                p.y += p.speedY;
+                p.speedY += p.gravity;
+                p.life -= 1;
+                p.size *= 0.98;
+
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(updateParticles);
+        }
+
+        function startExplosion() {
+            // إخفاء شاشة البداية
+            const triggerScreen = document.getElementById('trigger-screen');
+            const mainContent = document.getElementById('main-content');
+            
+            triggerScreen.style.transition = "opacity 0.6s";
+            triggerScreen.style.opacity = "0";
+            
+            // توليد الانفجار
+            for (let i = 0; i < 350; i++) {
+                createParticle(window.innerWidth / 2, window.innerHeight / 2);
+            }
+            updateParticles();
+
+            // إظهار المحتوى الرئيسي
+            setTimeout(() => {
+                triggerScreen.style.display = 'none';
+                mainContent.style.display = 'flex';
+                setTimeout(() => mainContent.style.opacity = '1', 100);
+                startTimer(); // بدء العداد
+                nextPoem(); // عرض أول قصيدة
+                startAutoPoem(); // بدء التغيير التلقائي
+            }, 800);
+        }
+
+        // === 2. منطق العداد (23/11/2025) ===
+        function startTimer() {
+            const startDate = new Date("November 23, 2025 00:00:00").getTime();
+
+            setInterval(function() {
+                const now = new Date().getTime();
+                // نستخدم Math.abs لضمان عمل العداد بشكل صحيح وحساب الفارق 
+                const distance = Math.abs(now - startDate);
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("days").innerText = days;
+                document.getElementById("hours").innerText = hours;
+                document.getElementById("minutes").innerText = minutes;
+                document.getElementById("seconds").innerText = seconds;
+            }, 1000);
+        }
+
+        // === 3. مكتبة القصائد والغزل ===
+        const poems = [
+            "يا حبيبتي.. عيناكِ رحلةٌ بدأت في 23/11 ولن تنتهي أبدًا.",
+            "سبحان من زرع في وجهك القبول، وفي قلبي كل هذا الحب لكِ.",
+            "حبيبتي.. أنتِ الاستثناء الوحيد في عالم مليء بالتشابه.",
+            "منذ 23/11، أصبح للوقت معنى، وللحياة لون آخر.",
+            "أحبكِ بعدد دقات قلبي منذ عرفتك وحتى هذه اللحظة.",
+            "في عيونك يا حبيبتي، رأيتُ وطني وأماني.",
+            "كل القصائد يا حبيبتي أمام حسنكِ عاجزة.",
+            "يا جميلة نوفمبر، ويا سيدة كل الشهور.",
+            "صوتكِ لحن، وضحكتكِ حياة، ووجودكِ نعمة.",
+            "حبيبتي.. ليت الكلمات تستطيع وصف جزءٍ من جمال روحك.",
+            "أنتِ قمري في ليالي الشتاء، وشمسي في أيام الربيع.",
+            "كل يوم يمر يزيدني يقيناً أنكِ أجمل أقداري.",
+            "يا حبيبتي.. قلبي لا ينبض إلا باسمك.",
+            "أعاهدكِ أن أبقى بجانبكِ حتى تتوقف الأيام عن العد.",
+            "أنتِ قهوتي، وصباحي، وكل أشيائي الجميلة.",
+            "حبيبتي.. أنتِ هي كلمة السر لسعادتي.",
+            "كيف لا أحب نوفمبر، وقد أهداني أجمل البشر؟",
+            "أنتِ النعمة التي أدعو الله كل يوم أن يديمها.",
+            "يا سيدة النساء.. أحبكِ جداً وجداً وجداً.",
+            "حبيبتي.. وجودك يغنيني عن العالم بأسره.",
+            "كل عام، كل شهر، كل يوم، وأنتِ حبيبتي.",
+            "عيناكِ مدرسة، وأنا التلميذ المغرم.",
+            "يا حبيبتي.. ابتسامتكِ ترمم روحي.",
+            "أحبكِ في الدقيقة ألف عام.",
+            "منذ التقينا، والتاريخ يكتب أجمل فصوله.",
+            "أنتِ النجم الذي يضيء عتمة أيامي.",
+            "حبيبتي.. يا زهرة عمري وريحانة فؤادي.",
+            "لا يوجد في هذا العالم ما هو أرق من قلبك.",
+            "بوجودك يا حبيبتي، أصبحت الحياة جنة.",
+            "كل ما أريده هو أن أراكِ تضحكين دائماً.",
+            "23/11.. تاريخ ميلاد قلبي من جديد.",
+            "حبيبتي.. أحبكِ بحجم السماء وأكثر.",
+            "أنتِ لغتي التي لا يفهمها سواي.",
+            "يا أميرة قلبي، دمتِ لي نبضاً لا يهدأ.",
+            "كل التفاصيل فيكِ يا حبيبتي تدعو للحب.",
+            "أنتِ الرضا بعد أعوام من التعب.",
+            "يا ملاذي الآمن في هذا العالم الصاخب.",
+            "حبيبتي.. مجرد التفكير بكِ يرسم الابتسامة على وجهي.",
+            "أحبكِ.. هذه هي الحقيقة الوحيدة الثابتة.",
+            "معكِ يا حبيبتي، كل اللحظات تصبح ذكريات لا تنسى."
+        ];
+
+        function nextPoem() {
+            const poemElement = document.getElementById('poem-text');
+            poemElement.style.opacity = 0; // إخفاء النص لعمل تأثير التلاشي
+            
+            setTimeout(() => {
+                // اختيار نص عشوائي
+                const randomIndex = Math.floor(Math.random() * poems.length);
+                poemElement.innerText = poems[randomIndex];
+                poemElement.style.opacity = 1; // إظهار النص الجديد
+            }, 500);
+        }
+
+        function startAutoPoem() {
+            setInterval(nextPoem, 8000); // تغيير النص كل 8 ثواني
+        }
+
+    </script>
+</body>
+</html>
+
